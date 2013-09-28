@@ -93,3 +93,14 @@ int Simpletui::choice(string text, vector<string> choices)
 size_t Simpletui::instance_count;
 void *Simpletui::cdk;
 void *Simpletui::cw;
+
+SimpletuiTempMessage::SimpletuiTempMessage(Simpletui &tui, string text)
+{
+	char *texts[]={const_cast<char*>(text.c_str())};
+	label=newCDKLabel(reinterpret_cast<CDKSCREEN*>(tui.cdk), CENTER, CENTER, texts, 1, TRUE, FALSE);
+	refreshCDKScreen(reinterpret_cast<CDKSCREEN*>(tui.cdk));
+}
+SimpletuiTempMessage::~SimpletuiTempMessage()
+{
+	destroyCDKLabel(reinterpret_cast<CDKLABEL*>(label));
+}

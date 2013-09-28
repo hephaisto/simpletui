@@ -32,4 +32,17 @@ public:
 	bool yesno(string text);
 	int choiceFew(string text, vector<string> choices);
 	int choice(string text, vector<string> choices);
+	friend class SimpletuiTempMessage;
+};
+
+class SimpletuiTempMessage
+{
+public:
+	SimpletuiTempMessage(Simpletui &tui, string text);
+	virtual ~SimpletuiTempMessage();
+private:
+	SimpletuiTempMessage();
+	SimpletuiTempMessage(SimpletuiTempMessage &other);
+	SimpletuiTempMessage& operator=(const SimpletuiTempMessage &other);
+	void *label;
 };

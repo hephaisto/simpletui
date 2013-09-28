@@ -1,6 +1,7 @@
 #include <simpletui.hpp>
 #include <exception>
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 
 int main(int argc, char** argv)
@@ -9,6 +10,10 @@ int main(int argc, char** argv)
 	{
 		Simpletui tui;
 		tui.msg("hello world");
+		{
+			SimpletuiTempMessage msg(tui, "waiting...");
+			system("sleep 1");
+		}
 		if(tui.yesno("continue?"))
 		{
 			string input=tui.inputString("please enter a string\nsecond line\nthird line",20);
