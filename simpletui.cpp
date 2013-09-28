@@ -9,27 +9,21 @@ const char* STActionAborted::what()
 
 string inputStringInternal(string text,int maxlen, EDisplayType type);
 
-static CDKSCREEN *cdk;
-static WINDOW *cw;
 Simpletui::Simpletui()
 {
-	if(instances.empty())
+	if(!(instance_count++))
 		staticInit();
-	instances.insert(this);
 }
 Simpletui::~Simpletui()
 {
-	set<Simpletui*>::iterator it=instances.find(this);
-	if(it!=instances.end())
-		instances.erase(it);
-	if(instances.empty())
+	if(!(--instance_count))
 		staticCleanup();
 }
 
 void Simpletui::staticInit()
 {
 	cw=initscr();
-	cdk=initCDKScreen(cw);
+	cdk=initCDKScreen(reinterpret_cast<WINDOW*>(cw));
 }
 void Simpletui::staticCleanup()
 {
@@ -39,19 +33,10 @@ void Simpletui::staticCleanup()
 void Simpletui::msg(string text)
 {
 	choiceFew(text, {"OK"});
-	//CDKLABEL *label=newCDKLabel(cdk,CENTER,CENTER,text.c_str(),1,TRUE,FALSE);
 }
-string Simpletui::inputString(string text,int maxlen)
+string Simpletui::inputString(string text,int maxlen, bool password)
 {
-	return inputStringInternal(text,maxlen,vMIXED);
-}
-string Simpletui::inputPassword(string text,int maxlen)
-{
-	return inputStringInternal(text,maxlen,vHMIXED);
-}
-string inputStringInternal(string text,int maxlen, EDisplayType type)
-{
-	CDKENTRY *entry=newCDKEntry(cdk,CENTER,CENTER,const_cast<char*>(text.c_str()),const_cast<char*>(""),A_NORMAL,'_',type,maxlen,0 , maxlen,TRUE,FALSE);
+	CDKENTRY *entry=newCDKEntry(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,const_cast<char*>(text.c_str()),const_cast<char*>(""),A_NORMAL,'_',password?vHMIXED:vMIXED,maxlen,0 , maxlen,TRUE,FALSE);
 	char* resulttext=activateCDKEntry(entry,NULL);
 	if(resulttext==NULL)
 	{
@@ -72,7 +57,7 @@ int Simpletui::choiceFew(string text, vector<string> choices)
 	for(size_t i=0;i<choices.size();i++)
 		choiceChars[i]=choices[i].c_str();
 	const char *textChar=text.c_str();
-	CDKDIALOG *dia=newCDKDialog(cdk,CENTER,CENTER,const_cast<char**>(&textChar),1,const_cast<char**>(choiceChars),choices.size(), A_STANDOUT,TRUE,TRUE,FALSE);
+	CDKDIALOG *dia=newCDKDialog(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,const_cast<char**>(&textChar),1,const_cast<char**>(choiceChars),choices.size(), A_STANDOUT,TRUE,TRUE,FALSE);
 	int result=activateCDKDialog(dia,NULL);
 	if(dia->exitType!=vNORMAL)
 	{
@@ -93,7 +78,7 @@ int Simpletui::choice(string text, vector<string> choices)
 		if(choices[i].length()>width)
 			width=choices[i].length();
 	}
-	CDKSCROLL *scroll=newCDKScroll(cdk,CENTER,CENTER,RIGHT,choices.size()+3,width,const_cast<char*>(text.c_str()),const_cast<char**>(choiceChars),choices.size(),FALSE,A_STANDOUT,TRUE,FALSE);
+	CDKSCROLL *scroll=newCDKScroll(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,RIGHT,choices.size()+3,width,const_cast<char*>(text.c_str()),const_cast<char**>(choiceChars),choices.size(),FALSE,A_STANDOUT,TRUE,FALSE);
 	int result=activateCDKScroll(scroll,NULL);
 	if(scroll->exitType!=vNORMAL)
 	{
@@ -105,4 +90,6 @@ int Simpletui::choice(string text, vector<string> choices)
 	return result;
 }
 
-set<Simpletui*> Simpletui::instances;
+size_t Simpletui::instance_count;
+void *Simpletui::cdk;
+void *Simpletui::cw;

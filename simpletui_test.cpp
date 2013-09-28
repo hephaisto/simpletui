@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 		{
 			string input=tui.inputString("please enter a string\nsecond line\nthird line",20);
 			tui.msg("you entered "+input);
-			string psw=tui.inputPassword("please enter a password",20);
+			string psw=tui.inputString("please enter a password",20,true);
 			//tui.inputInt("please enter a number");
 			vector<string> choices= {"choice1","choice2"};
 			int result=tui.choiceFew("please choose",choices);
