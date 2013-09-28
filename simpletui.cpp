@@ -27,6 +27,7 @@ void Simpletui::staticInit()
 }
 void Simpletui::staticCleanup()
 {
+	destroyCDKScreen(reinterpret_cast<CDKSCREEN*>(cdk));
 	endCDK();
 }
 
