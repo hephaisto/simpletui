@@ -21,7 +21,7 @@ $(SONAME): $(SONAME).$(VERSION)
 	ln -s $< $@
 
 test_local: simpletui_test_local
-	LD_LIBRARY_PATH=. ./simpletui_test
+	LD_LIBRARY_PATH=. ./simpletui_test_local
 
 test: simpletui_test
 	./simpletui_test
