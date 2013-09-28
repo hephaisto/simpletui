@@ -1,4 +1,4 @@
-#include "simpletui.hpp"
+#include <simpletui.hpp>
 #include <exception>
 #include <iostream>
 using namespace std;
