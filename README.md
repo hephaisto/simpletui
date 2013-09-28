@@ -6,6 +6,8 @@ a simple text user interface (wrapper for CDK)
 This library is intended to be used for small configuration tools, that can show the user various choices instead of requiring editing of config files or specifying the correct command-line parameters.
 It is not intendet to create complex user-interfaces. Instead, it is more like an ugly library-version of the dialog utility for shell scripts.
 
+This code is released under the MIT license.
+
 dependencies
 ------------
 
