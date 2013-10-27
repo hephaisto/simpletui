@@ -39,7 +39,7 @@ install:
 	cp $(SONAME).$(VERSION) $(INSTALL_LIB)/
 	ln -s $(SONAME).$(VERSION) $(INSTALL_LIB)/$(SONAME)
 	cp simpletui.hpp $(INSTALL_INC)/
-	lcdonfig
+	ldconfig
 
 clean:
 	rm *.o $(SONAME) $(SONAME).$(VERSION) simpletui_test
