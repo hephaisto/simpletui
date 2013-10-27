@@ -6,6 +6,47 @@ const char* STActionAborted::what()
 	return "action aborted by user";
 }
 
+class SplitString
+{
+	vector<string> lines;
+	char **buf;
+public:
+	SplitString(string s);
+	~SplitString();
+	char** getPtr();
+	size_t getLength();
+};
+
+SplitString::SplitString(string s)
+{
+	size_t endpos=0;
+	size_t startpos=0;
+	do
+	{
+		endpos=s.find("\n",startpos);
+		string substr=s.substr(startpos,endpos-startpos);
+		lines.push_back(substr);
+		startpos=endpos+1;
+		//cerr<<substr<<"\n";
+	}
+	while(endpos!=string::npos);
+	buf=new char*[lines.size()];
+	for(size_t i=0;i<lines.size();i++)
+		buf[i]=const_cast<char*>(lines[i].c_str());
+}
+SplitString::~SplitString()
+{
+	delete[] buf;
+}
+char** SplitString::getPtr()
+{
+	return buf;
+}
+size_t SplitString::getLength()
+{
+	return lines.size();
+}
+
 
 string inputStringInternal(string text,int maxlen, EDisplayType type);
 
@@ -57,8 +98,10 @@ int Simpletui::choiceFew(string text, vector<string> choices)
 	const char **choiceChars=new const char*[choices.size()];
 	for(size_t i=0;i<choices.size();i++)
 		choiceChars[i]=choices[i].c_str();
-	const char *textChar=text.c_str();
-	CDKDIALOG *dia=newCDKDialog(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,const_cast<char**>(&textChar),1,const_cast<char**>(choiceChars),choices.size(), A_STANDOUT,TRUE,TRUE,FALSE);
+
+	SplitString sText(text);
+
+	CDKDIALOG *dia=newCDKDialog(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,sText.getPtr(),sText.getLength(),const_cast<char**>(choiceChars),choices.size(), A_STANDOUT,TRUE,TRUE,FALSE);
 	int result=activateCDKDialog(dia,NULL);
 	if(dia->exitType!=vNORMAL)
 	{
@@ -79,7 +122,8 @@ int Simpletui::choice(string text, vector<string> choices)
 		if(choices[i].length()>width)
 			width=choices[i].length();
 	}
-	CDKSCROLL *scroll=newCDKScroll(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,RIGHT,choices.size()+3,width,const_cast<char*>(text.c_str()),const_cast<char**>(choiceChars),choices.size(),FALSE,A_STANDOUT,TRUE,FALSE);
+	SplitString sText(text);
+	CDKSCROLL *scroll=newCDKScroll(reinterpret_cast<CDKSCREEN*>(cdk),CENTER,CENTER,RIGHT,choices.size()+sText.getLength()+2,width,const_cast<char*>(text.c_str()),const_cast<char**>(choiceChars),choices.size(),FALSE,A_STANDOUT,TRUE,FALSE);
 	int result=activateCDKScroll(scroll,NULL);
 	if(scroll->exitType!=vNORMAL)
 	{
@@ -97,8 +141,8 @@ void *Simpletui::cw;
 
 SimpletuiTempMessage::SimpletuiTempMessage(Simpletui &tui, string text)
 {
-	char *texts[]={const_cast<char*>(text.c_str())};
-	label=newCDKLabel(reinterpret_cast<CDKSCREEN*>(tui.cdk), CENTER, CENTER, texts, 1, TRUE, FALSE);
+	SplitString sText(text);
+	label=newCDKLabel(reinterpret_cast<CDKSCREEN*>(tui.cdk), CENTER, CENTER, sText.getPtr(), sText.getLength(), TRUE, FALSE);
 	refreshCDKScreen(reinterpret_cast<CDKSCREEN*>(tui.cdk));
 }
 SimpletuiTempMessage::~SimpletuiTempMessage()
